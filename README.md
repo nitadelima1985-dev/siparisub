@@ -1,7 +1,6 @@
-<<<<<<< HEAD
-# SIPARSUB
+# SIPARISUB
 
-SIPARSUB adalah fondasi aplikasi Laravel 11 untuk Sistem Informasi Pariwisata Kabupaten Subang berbasis collaborative governance dengan dashboard multi-role.
+SIPARISUB adalah fondasi aplikasi Laravel 11 untuk Sistem Informasi Pariwisata Kabupaten Subang berbasis collaborative governance dengan dashboard multi-role.
 
 ## Fitur tahap awal
 
@@ -266,7 +265,3 @@ Cara test cepat:
 4. Cek email user `admin_dinas` dan `reviewer_akademik` aktif.
 5. Login sebagai reviewer/admin, kirim revisi/approve/publish.
 6. Cek email pengusul dan tabel `notifications`.
-=======
-# siparisub
-sistem informasi pariwisata subang
->>>>>>> b3ed20ac6feafb090e3bbf954283aebb93ac437f

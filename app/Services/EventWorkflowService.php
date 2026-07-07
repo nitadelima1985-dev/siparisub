@@ -11,6 +11,10 @@ use Illuminate\Support\Facades\DB;
 
 class EventWorkflowService
 {
+    public function __construct(private WorkflowNotificationService $notifications)
+    {
+    }
+
     public function submit(Event $event, User $actor, ?string $note = null): void
     {
         $this->transition(
@@ -138,6 +142,7 @@ class EventWorkflowService
             ],
         );
     }
+
     private function transition(
         Event $event,
         User $actor,
@@ -180,5 +185,8 @@ class EventWorkflowService
                 'updated_by' => $actor->id,
             ]);
         });
+
+        $event->refresh();
+        $this->notifications->notify($event, $toStatus, $actionType, $note);
     }
 }

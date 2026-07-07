@@ -11,6 +11,10 @@ use Illuminate\Support\Facades\DB;
 
 class DestinationWorkflowService
 {
+    public function __construct(private WorkflowNotificationService $notifications)
+    {
+    }
+
     public function submit(Destination $destination, User $actor, ?string $note = null): void
     {
         $this->transition(
@@ -181,6 +185,9 @@ class DestinationWorkflowService
                 'updated_by' => $actor->id,
             ]);
         });
+
+        $destination->refresh();
+        $this->notifications->notify($destination, $toStatus, $actionType, $note);
     }
 }
 

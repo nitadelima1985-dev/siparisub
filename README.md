@@ -227,3 +227,41 @@ Halaman `/dashboard` menampilkan statistik berbeda sesuai role pengguna:
 - `admin_humas`: destinasi, event, artikel miliknya, dan revisi yang harus ditindaklanjuti.
 - `konten_kreator`: statistik artikel miliknya berdasarkan status workflow.
 - `reviewer_akademik`: total submitted, under review, revision needed, dan konten terbaru yang perlu direview.
+## Email notification workflow
+
+Workflow destinasi, event, dan artikel dapat mengirim notifikasi internal dan email melalui `App\Services\WorkflowNotificationService`.
+
+Jalankan migration baru untuk tabel notifikasi:
+
+```bash
+php artisan migrate
+```
+
+Contoh konfigurasi SMTP di `.env`:
+
+```env
+MAIL_MAILER=smtp
+MAIL_HOST=smtp.gmail.com
+MAIL_PORT=587
+MAIL_USERNAME=alamat_email_pengirim
+MAIL_PASSWORD=app_password_email
+MAIL_ENCRYPTION=tls
+MAIL_FROM_ADDRESS=alamat_email_pengirim
+MAIL_FROM_NAME="SIPARISUB"
+QUEUE_CONNECTION=sync
+```
+
+Jika memakai Gmail, gunakan App Password, bukan password utama akun. Untuk pengiriman email lewat queue, ubah `QUEUE_CONNECTION` ke driver queue yang dipakai dan jalankan worker:
+
+```bash
+php artisan queue:work
+```
+
+Cara test cepat:
+
+1. Pastikan SMTP di `.env` valid.
+2. Jalankan `php artisan config:clear`.
+3. Login sebagai pengusul lalu submit destinasi/event/artikel.
+4. Cek email user `admin_dinas` dan `reviewer_akademik` aktif.
+5. Login sebagai reviewer/admin, kirim revisi/approve/publish.
+6. Cek email pengusul dan tabel `notifications`.

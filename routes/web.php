@@ -2,9 +2,11 @@
 
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Dashboard\ArticleController;
+use App\Http\Controllers\Dashboard\ApprovalController;
 use App\Http\Controllers\Dashboard\DashboardController;
 use App\Http\Controllers\Dashboard\DestinationController;
 use App\Http\Controllers\Dashboard\EventController;
+use App\Http\Controllers\Dashboard\NotificationController;
 use App\Http\Controllers\Dashboard\OrganizationController;
 use App\Http\Controllers\Dashboard\ReportController;
 use App\Http\Controllers\Dashboard\UserController;
@@ -35,6 +37,15 @@ Route::middleware('auth')->group(function (): void {
 
     Route::prefix('dashboard')->name('dashboard.')->group(function (): void {
         Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
+        Route::get('/approvals', [ApprovalController::class, 'index'])->name('approvals.index');
+        Route::post('/approvals/{approval}/under-review', [ApprovalController::class, 'markUnderReview'])->name('approvals.under-review');
+        Route::post('/approvals/{approval}/revision-needed', [ApprovalController::class, 'requestRevision'])->name('approvals.revision-needed');
+        Route::post('/approvals/{approval}/approve', [ApprovalController::class, 'approve'])->name('approvals.approve');
+        Route::post('/approvals/{approval}/publish', [ApprovalController::class, 'publish'])->name('approvals.publish');
+        Route::post('/approvals/{approval}/archive', [ApprovalController::class, 'archive'])->name('approvals.archive');
+        Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+        Route::post('/notifications/read-all', [NotificationController::class, 'markAllAsRead'])->name('notifications.read-all');
+        Route::post('/notifications/{notification}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
         Route::resource('organizations', OrganizationController::class)->except(['destroy']);
         Route::resource('users', UserController::class)->except(['destroy']);
         Route::patch('/users/{user}/toggle-active', [UserController::class, 'toggleActive'])->name('users.toggle-active');

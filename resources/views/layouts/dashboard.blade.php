@@ -214,10 +214,12 @@
         <div class="sidebar-label">Kolaborasi</div>
 
         <nav class="nav flex-column">
-            <a class="nav-link" href="#">
-                <i class="fa-solid fa-check-double"></i>
-                <span>Approval</span>
-            </a>
+            @if(auth()->user()->hasRole('super_admin', 'admin_dinas', 'reviewer_akademik'))
+                <a class="nav-link {{ request()->routeIs('dashboard.approvals.*') ? 'active' : '' }}" href="{{ route('dashboard.approvals.index') }}">
+                    <i class="fa-solid fa-check-double"></i>
+                    <span>Approval</span>
+                </a>
+            @endif
             @if(auth()->user()->hasRole('super_admin', 'admin_dinas', 'admin_pokdarwis', 'admin_humas', 'konten_kreator', 'reviewer_akademik'))
                 <a class="nav-link {{ request()->routeIs('dashboard.events.*') ? 'active' : '' }}" href="{{ route('dashboard.events.index') }}">
                     <i class="fa-solid fa-calendar-days"></i>
@@ -235,6 +237,42 @@
             </div>
 
             <div class="d-flex align-items-center gap-2">
+                @php
+                    $dashboardNotifications = \Illuminate\Support\Facades\Schema::hasTable('notifications')
+                        ? auth()->user()->notifications()->latest()->limit(5)->get()
+                        : collect();
+                    $dashboardUnreadNotificationCount = \Illuminate\Support\Facades\Schema::hasTable('notifications')
+                        ? auth()->user()->notifications()->whereNull('read_at')->count()
+                        : 0;
+                @endphp
+
+                <div class="dropdown">
+                    <button class="btn btn-outline-secondary btn-sm position-relative" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Notifikasi">
+                        <i class="fa-solid fa-bell"></i>
+                        @if($dashboardUnreadNotificationCount > 0)
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">{{ $dashboardUnreadNotificationCount }}</span>
+                        @endif
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-end shadow border-0 p-0" style="width: 360px; max-width: calc(100vw - 32px);">
+                        <div class="d-flex justify-content-between align-items-center px-3 py-2 border-bottom">
+                            <span class="fw-semibold">Notifikasi</span>
+                            <a class="small text-decoration-none" href="{{ route('dashboard.notifications.index') }}">Lihat semua</a>
+                        </div>
+                        @forelse($dashboardNotifications as $notification)
+                            <form method="POST" action="{{ route('dashboard.notifications.read', $notification) }}" class="border-bottom">
+                                @csrf
+                                <button class="dropdown-item text-wrap py-3 {{ $notification->read_at ? '' : 'bg-light' }}" type="submit">
+                                    <div class="fw-semibold small">{{ $notification->title }}</div>
+                                    <div class="text-secondary small">{{ \Illuminate\Support\Str::limit($notification->message, 90) }}</div>
+                                    <div class="text-muted small mt-1">{{ $notification->created_at->diffForHumans() }}</div>
+                                </button>
+                            </form>
+                        @empty
+                            <div class="px-3 py-4 text-center text-secondary small">Belum ada notifikasi.</div>
+                        @endforelse
+                    </div>
+                </div>
+
                 <a class="user-badge text-decoration-none" href="{{ route('dashboard.profile') }}">
                     <i class="fa-solid fa-user me-1"></i>
                     {{ auth()->user()->name }}

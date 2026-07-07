@@ -11,6 +11,10 @@ use Illuminate\Support\Facades\DB;
 
 class ArticleWorkflowService
 {
+    public function __construct(private WorkflowNotificationService $notifications)
+    {
+    }
+
     public function submit(Article $article, User $actor, ?string $note = null): void
     {
         $this->transition($article, $actor, WorkflowStatus::Submitted, 'submit_article', $note, [
@@ -87,6 +91,7 @@ class ArticleWorkflowService
             'is_active' => true,
         ]);
     }
+
     private function transition(
         Article $article,
         User $actor,
@@ -129,5 +134,8 @@ class ArticleWorkflowService
                 'updated_by' => $actor->id,
             ]);
         });
+
+        $article->refresh();
+        $this->notifications->notify($article, $toStatus, $actionType, $note);
     }
 }

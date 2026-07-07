@@ -85,6 +85,11 @@ class User extends Authenticatable
         return $this->hasMany(Article::class, 'approved_by');
     }
 
+    public function notifications(): HasMany
+    {
+        return $this->hasMany(Notification::class);
+    }
+
     public function createdEvents(): HasMany
     {
         return $this->hasMany(Event::class, 'created_by');
